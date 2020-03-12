@@ -4,7 +4,7 @@ import "strconv"
 
 import "k8s.io/client-go/pkg/api/v1"
 import "github.com/prometheus/client_golang/prometheus"
-import zfs "github.com/simt2/go-zfs"
+import "github.com/simt2/go-zfs"
 import log "github.com/Sirupsen/logrus"
 
 const (
@@ -40,7 +40,7 @@ func (p ZFSProvisioner) Collect(ch chan<- prometheus.Metric) {
 	}
 
 	for _, child := range children {
-		// Skip shapshots
+		// Skip snapshots
 		if child.Type != "filesystem" {
 			continue
 		}

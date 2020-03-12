@@ -18,6 +18,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/validation/field"
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/kubernetes"
+	restClient "k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 )
 
@@ -29,6 +30,9 @@ const (
 )
 
 func main() {
+
+	var err error
+
 	viper.SetEnvPrefix("zfs")
 	viper.AutomaticEnv()
 
@@ -41,7 +45,7 @@ func main() {
 	viper.SetDefault("metrics_port", "8080")
 	viper.SetDefault("debug", false)
 
-	if viper.GetBool("debug") == true {
+	if viper.GetBool("debug") {
 		log.SetLevel(log.DebugLevel)
 	}
 
@@ -53,7 +57,9 @@ func main() {
 	}
 
 	// Retrieve kubernetes config and connect to server
-	config, err := clientcmd.BuildConfigFromFlags("", viper.GetString("kube_conf"))
+	var config *restClient.Config
+
+	config, err = clientcmd.BuildConfigFromFlags("", viper.GetString("kube_conf"))
 	if err != nil {
 		log.WithFields(log.Fields{
 			"error": err,
@@ -63,14 +69,16 @@ func main() {
 		"config": viper.GetString("kube_conf"),
 	}).Info("Loaded kubernetes config")
 
-	clientset, err := kubernetes.NewForConfig(config)
+	var clientSet *kubernetes.Clientset
+
+	clientSet, err = kubernetes.NewForConfig(config)
 	if err != nil {
 		log.WithFields(log.Fields{
 			"error": err,
 		}).Fatal("Failed to create client")
 	}
 
-	serverVersion, err := clientset.Discovery().ServerVersion()
+	serverVersion, err := clientSet.Discovery().ServerVersion()
 	if err != nil {
 		log.WithFields(log.Fields{
 			"error": err,
@@ -94,7 +102,7 @@ func main() {
 	// Load ZFS parent dataset
 	if viper.GetString("parent_dataset") == "" {
 		log.WithFields(log.Fields{
-			"error": errors.New("Parent dataset is not set"),
+			"error": errors.New("parent dataset is not set"),
 		}).Fatal("Could not open ZFS parent dataset")
 	}
 	parent, err := zfs.GetDataset(viper.GetString("parent_dataset"))
@@ -123,7 +131,7 @@ func main() {
 	log.Info("Started Prometheus exporter")
 
 	// Start the controller
-	pc := controller.NewProvisionController(clientset, 15*time.Second, viper.GetString("provisioner_name"), zfsProvisioner, serverVersion.GitVersion, false, 2, leasePeriod, renewDeadline, retryPeriod, termLimit)
+	pc := controller.NewProvisionController(clientSet, 15*time.Second, viper.GetString("provisioner_name"), zfsProvisioner, serverVersion.GitVersion, false, 2, leasePeriod, renewDeadline, retryPeriod, termLimit)
 	log.Info("Listening for events")
 	pc.Run(wait.NeverStop)
 }

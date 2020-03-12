@@ -5,7 +5,7 @@ import (
 	"regexp"
 
 	log "github.com/Sirupsen/logrus"
-	zfs "github.com/simt2/go-zfs"
+	"github.com/simt2/go-zfs"
 	"k8s.io/client-go/pkg/api/v1"
 )
 
@@ -18,7 +18,7 @@ func (p ZFSProvisioner) Delete(volume *v1.PersistentVolume) error {
 
 	log.WithFields(log.Fields{
 		"volume": volume.Spec.NFS.Path,
-	}).Info("Deleted volume")
+	}).Info("deleted volume")
 	return nil
 }
 
@@ -26,7 +26,7 @@ func (p ZFSProvisioner) Delete(volume *v1.PersistentVolume) error {
 func (p ZFSProvisioner) deleteVolume(volume *v1.PersistentVolume) error {
 	children, err := p.parent.Children(0)
 	if err != nil {
-		return fmt.Errorf("Retrieving ZFS dataset for deletion failed with: %v", err.Error())
+		return fmt.Errorf("retrieving ZFS dataset for deletion failed with: %v", err.Error())
 	}
 
 	var dataset *zfs.Dataset
@@ -42,16 +42,12 @@ func (p ZFSProvisioner) deleteVolume(volume *v1.PersistentVolume) error {
 		}
 	}
 	if dataset == nil {
-		err = fmt.Errorf("Volume %v could not be found", &volume)
-	}
-
-	if err != nil {
-		return fmt.Errorf("Retrieving ZFS dataset for deletion failed with: %v", err.Error())
+		return fmt.Errorf("volume %v could not be found", &volume)
 	}
 
 	err = dataset.Destroy(zfs.DestroyRecursive)
 	if err != nil {
-		return fmt.Errorf("Deleting ZFS dataset failed with: %v", err.Error())
+		return fmt.Errorf("deleting ZFS dataset failed with: %v", err.Error())
 	}
 
 	return nil
