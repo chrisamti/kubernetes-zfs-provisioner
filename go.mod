@@ -12,7 +12,7 @@ require (
 	github.com/docker/distribution v2.7.1+incompatible // indirect
 	github.com/emicklei/go-restful v1.1.4-0.20161212084525-09691a3b6378 // indirect
 	github.com/fsnotify/fsnotify v1.4.3-0.20161013012219-bd2828f9f176 // indirect
-	github.com/gentics/kubernetes-zfs-provisioner v0.0.0-20190207174401-75af96ff61c2
+	github.com/gentics/kubernetes-zfs-provisioner v0.0.0-20190207174401-75af96ff61c2 // indirect
 	github.com/ghodss/yaml v0.0.0-20150909031657-73d445a93680 // indirect
 	github.com/go-openapi/jsonpointer v0.0.0-20160704185906-46af16f9f7b1 // indirect
 	github.com/go-openapi/jsonreference v0.0.0-20160704190145-13c6e3589ad9 // indirect

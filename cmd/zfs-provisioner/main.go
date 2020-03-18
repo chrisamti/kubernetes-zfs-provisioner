@@ -2,13 +2,15 @@ package main
 
 import (
 	"errors"
+	"k8s.io/apimachinery/pkg/version"
 	"net/http"
 	"os/exec"
 	"strings"
 	"time"
 
 	log "github.com/Sirupsen/logrus"
-	"github.com/gentics/kubernetes-zfs-provisioner/pkg/provisioner"
+	// "github.com/gentics/kubernetes-zfs-provisioner/pkg/provisioner"
+	"github.com/chrisamti/kubernetes-zfs-provisioner/pkg/provisioner"
 	"github.com/kubernetes-incubator/external-storage/lib/controller"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
@@ -78,7 +80,9 @@ func main() {
 		}).Fatal("Failed to create client")
 	}
 
-	serverVersion, err := clientSet.Discovery().ServerVersion()
+	var serverVersion *version.Info
+
+	serverVersion, err = clientSet.Discovery().ServerVersion()
 	if err != nil {
 		log.WithFields(log.Fields{
 			"error": err,
@@ -105,7 +109,10 @@ func main() {
 			"error": errors.New("parent dataset is not set"),
 		}).Fatal("Could not open ZFS parent dataset")
 	}
-	parent, err := zfs.GetDataset(viper.GetString("parent_dataset"))
+
+	var parent *zfs.Dataset
+
+	parent, err = zfs.GetDataset(viper.GetString("parent_dataset"))
 	if err != nil {
 		log.WithFields(log.Fields{
 			"error": err,
@@ -131,7 +138,20 @@ func main() {
 	log.Info("Started Prometheus exporter")
 
 	// Start the controller
-	pc := controller.NewProvisionController(clientSet, 15*time.Second, viper.GetString("provisioner_name"), zfsProvisioner, serverVersion.GitVersion, false, 2, leasePeriod, renewDeadline, retryPeriod, termLimit)
+	pc := controller.NewProvisionController(
+		clientSet,
+		15*time.Second,
+		viper.GetString("provisioner_name"),
+		zfsProvisioner,
+		serverVersion.GitVersion,
+		false,
+		2,
+		leasePeriod,
+		renewDeadline,
+		retryPeriod,
+		termLimit,
+	)
+
 	log.Info("Listening for events")
 	pc.Run(wait.NeverStop)
 }

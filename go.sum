@@ -121,6 +121,7 @@ gopkg.in/yaml.v2 v2.0.0-20160928153709-a5b47d31c556 h1:hKXbLW5oaJoQgs8KrzTLdF4Po
 gopkg.in/yaml.v2 v2.0.0-20160928153709-a5b47d31c556/go.mod h1:JAlM8MvJe8wmxCU4Bli9HhUf9+ttbYbLASfIpnQbh74=
 k8s.io/apimachinery v0.0.0-20170320215402-c1c4a7fe8328 h1:+aKuRnzyM7LRLvmLR6ag4V7K2RLVZWr4II5WSxGLi2w=
 k8s.io/apimachinery v0.0.0-20170320215402-c1c4a7fe8328/go.mod h1:ccL7Eh7zubPUSh9A3USN90/OzHNSVN6zxzde07TDCL0=
+k8s.io/apimachinery v0.17.4 h1:UzM+38cPUJnzqSQ+E1PY4YxMHIzQyCg29LOoGfo79Zw=
 k8s.io/client-go v0.0.0-20170321210959-76153773eaa3 h1:tqqpfQ6ZubLkhMJ6aXxL/QYOuKoyesqT/4+AIhyZEZk=
 k8s.io/client-go v0.0.0-20170321210959-76153773eaa3/go.mod h1:7vJpHMYJwNQCWgzmNV+VYUl1zCObLyodBc8nIyt8L5s=
 k8s.io/kubernetes v1.6.0 h1:/ytAnebVrSd7sdUg9cQD8pjrNyxiCuV0+BxNs4IFMVw=

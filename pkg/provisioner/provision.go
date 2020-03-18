@@ -6,8 +6,8 @@ import (
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/kubernetes-incubator/external-storage/lib/controller"
-	zfs "github.com/simt2/go-zfs"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"github.com/simt2/go-zfs"
+	metaV1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/pkg/api/v1"
 )
 
@@ -26,16 +26,17 @@ func (p ZFSProvisioner) Provision(options controller.VolumeOptions) (*v1.Persist
 	annotations[annCreatedBy] = createdBy
 
 	pv := &v1.PersistentVolume{
-		ObjectMeta: metav1.ObjectMeta{
+		ObjectMeta: metaV1.ObjectMeta{
 			Name:        options.PVName,
 			Labels:      map[string]string{},
 			Annotations: annotations,
 		},
 		Spec: v1.PersistentVolumeSpec{
 			PersistentVolumeReclaimPolicy: p.reclaimPolicy,
-			AccessModes:                   options.PVC.Spec.AccessModes,
+
+			AccessModes: options.PVC.Spec.AccessModes,
 			Capacity: v1.ResourceList{
-				v1.ResourceName(v1.ResourceStorage): options.PVC.Spec.Resources.Requests[v1.ResourceName(v1.ResourceStorage)],
+				v1.ResourceStorage: options.PVC.Spec.Resources.Requests[v1.ResourceStorage],
 			},
 			PersistentVolumeSource: v1.PersistentVolumeSource{
 				NFS: &v1.NFSVolumeSource{
@@ -59,14 +60,14 @@ func (p ZFSProvisioner) createVolume(options controller.VolumeOptions) (string, 
 
 	properties["sharenfs"] = p.shareOptions
 
-	storageRequest := options.PVC.Spec.Resources.Requests[v1.ResourceName(v1.ResourceStorage)]
+	storageRequest := options.PVC.Spec.Resources.Requests[v1.ResourceStorage]
 	storageRequestBytes := strconv.FormatInt(storageRequest.Value(), 10)
 	properties["refquota"] = storageRequestBytes
 	properties["refreservation"] = storageRequestBytes
 
 	dataset, err := zfs.CreateFilesystem(zfsPath, properties)
 	if err != nil {
-		return "", fmt.Errorf("Creating ZFS dataset failed with: %v", err.Error())
+		return "", fmt.Errorf("creating zfs dataset failed with: %v", err.Error())
 	}
 
 	return dataset.Mountpoint, nil

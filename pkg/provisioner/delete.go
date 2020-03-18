@@ -35,6 +35,11 @@ func (p ZFSProvisioner) deleteVolume(volume *v1.PersistentVolume) error {
 			continue
 		}
 
+		log.WithFields(log.Fields{
+			"volume": volume.Name,
+			"child":  child.Name,
+		}).Info("delete volume")
+
 		matched, _ := regexp.MatchString(`.+\/`+volume.Name, child.Name)
 		if matched {
 			dataset = child
